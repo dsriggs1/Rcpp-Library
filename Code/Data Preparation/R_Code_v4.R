@@ -139,27 +139,6 @@ for(i in 2:nrow(df))
   })
 }
 
-test<-as.data.frame(lag(df$PR_Run1_fl))
-test<-df
-
-test$stolen_base<-ifelse((df$EVENT_CD==4 & df$BASE1_RUN_ID==lead(df$BASE2_RUN_ID)
-                          
-x<-as.data.frame(df$bat_id[which(df$EVENT_CD==4 & (df$BASE1_RUN_ID==lead(df$BASE2_RUN_ID)) 
-                                 | (df$EVENT_CD==4 &  (df$BASE2_RUN_ID==lead(df$BASE3_RUN_ID)))
-                                 | (df$EVENT_CD==4 &  (df$BASE3_RUN_ID==lead(df$BASE3_RUN_ID))))])
-                          
-                          
-                          lead(df$RUN1_SB_FL)==TRUE & lead(df$PR_Run1_fl)==FALSE & 
-                            df$PR_Run1_fl==FALSE),1,0)
-
-
-
-test$stolen_base<-ifelse((lead(df$RUN2_SB_FL)==TRUE & lead(df$PR_Run2_fl)==FALSE & df$PR_Run2_fl==FALSE),
-1,test$stolen_base)
-
-test$stolen_base<-ifelse((lead(df$RUN3_SB_FL)==TRUE & lead(df$PR_Run3_fl)==FALSE & df$PR_Run3_fl==FALSE),
-                         1,test$stolen_base)
-
 proc.time() - ptm
 
 
