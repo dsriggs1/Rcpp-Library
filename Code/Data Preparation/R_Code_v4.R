@@ -63,6 +63,30 @@ df<-merge(events,weather)
 
 df<-distinct(df)
 
+#Adding variables for the impact of individual events on fantasy points
+#Batter Points
+single=3
+double=5
+triple=8
+hr=10
+rbi=2
+run=2
+walk=2
+hbp=2
+sb=5
+
+#Pitcher Points
+ip=2.25 #innings pitched
+so=2 #strikeout
+win=4
+era=-2 #earned run allowed
+ha=-0.6 #hit against (allowed a hit)
+walk=-0.6
+hb=-0.6 #hit batter
+cg=2.5 #complete game
+cgs=2.5 #complete game shutout
+nh=5 #no hitter
+
 #Creating Flag for Hits
 df$hit_fl<-df$EVENT_CD == "20"|df$EVENT_CD == "21"|df$EVENT_CD == "22"|df$EVENT_CD=="23"
 
