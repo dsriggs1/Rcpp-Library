@@ -115,29 +115,21 @@ df$stadium <- as.factor(df$stadium)
 df$fantasypoints <- ifelse(df$BAT_FATE_ID==4,df$fantasypoints+3+df$RBI_CT*(3),df$fantasypoints)
 
 #Computing Stolen Base Points
-for(i in 2:nrow(df))
-{
-  #Stolen second base
-  try(if(df$RUN1_SB_FL[i]==TRUE & df$PR_Run1_fl[i]==FALSE & df$PR_Run1_fl[i-1]==FALSE)
-  {j<-i
-  while(as.character(df$bat_id[j])!=as.character(df$BASE1_RUN_ID[i])){j <-j-1 }
-  df$fantasypoints[j] <- df$fantasypoints[j]+3
-  print(i)
-  })
-  #Stolen third base
-  try(if(df$RUN2_SB_FL[i]==TRUE & df$PR_Run2_fl[i]==FALSE & df$PR_Run2_fl[i-1]==FALSE)
-  {k<-i
-  while(as.character(df$bat_id[k])!=as.character(df$BASE2_RUN_ID[i])){k <- k-1 }
-  df$fantasypoints[k] <- df$fantasypoints[k]+3
-  })
-  #Stolen home base
-  try(if(df$RUN3_SB_FL[i]==TRUE & df$PR_Run3_fl[i]==FALSE & df$PR_Run3_fl[i-1]==FALSE)
-  {
-    l<-i
-    while(df$bat_id[l]!=as.character(df$BASE3_RUN_ID[i])){l <-l-1 }
-    df$fantasypoints[l] <- df$fantasypoints[l]+3
-  })
-}
+sb<-as.data.frame(df[which(df$EVENT_CD==4),])
+
+sb$BASE_STL_ID<-ifelse(sb$RUN1_SB_FL==TRUE & sb$RUN2_SB_FL==TRUE, paste(sb$BASE1_RUN_ID, sb$BASE2_RUN_ID),
+                ifelse(sb$RUN1_SB_FL==TRUE & sb$RUN3_SB_FL==TRUE, paste(sb$BASE1_RUN_ID, sb$BASE3_RUN_ID),
+                ifelse(sb$RUN2_SB_FL==TRUE & sb$RUN3_SB_FL==TRUE, paste(sb$BASE2_RUN_ID, sb$BASE3_RUN_ID),
+                ifelse(sb$RUN1_SB_FL==TRUE, as.character(sb$BASE1_RUN_ID), 
+                ifelse(sb$RUN2_SB_FL==TRUE, as.character(sb$BASE2_RUN_ID),
+                as.character(sb$BASE3_RUN_ID))))))
+
+sb<-separate_rows(sb,BASE_STL_ID,sep=" ")
+
+sb$STOLEN_BASE_POINTS<-3
+
+sb<-setNames(aggregate(sb$STOLEN_BASE_POINTS, by=list(sb$GAME_ID, sb$BASE_STL_ID), FUN=sum)
+             , c("GAME_ID", "BASE_STL_ID", "STOLEN_BASE_POINTS"))
 
 proc.time() - ptm
 
@@ -180,6 +172,9 @@ dfg2<-aggregate(list(gameab=df$gameab, gamehits=df$gamehits,gamesingles=df$games
                      gameubb=df$gameubb, PA_BALL_CT=df$PA_BALL_CT, gameballs=df$gameballs, gameswingstrikes=df$gameswingstrikes), 
                      by=list(GAME_ID=df$GAME_ID, Game=df$Game, bat_id=df$bat_id, PIT_ID=df$PIT_ID,
                      BAT_HAND_CD=df$BAT_HAND_CD, PIT_HAND_CD=df$PIT_HAND_CD, YEAR_ID=df$YEAR_ID), FUN=max)
+
+#Merging Stolen Base points here
+dfg<-merge(x=dfg, y=sb, by.x=c("GAME_ID", "bat_id"), by.y=c("GAME_ID","BASE_STL_ID"), all.x=TRUE)
 
 #Getting Stadiums
 dfgstadium<-aggregate(list(stadium=df$stadium,BAT_LINEUP_ID=df$BAT_LINEUP_ID,BAT_HOME_ID=df$BAT_HOME_ID, 
