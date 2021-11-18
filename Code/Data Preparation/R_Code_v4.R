@@ -194,7 +194,7 @@ dfgp <-aggregate(list(pitchingpoints=df$pitchingpoints), by=list(GAME_ID=df$GAME
 dfg2<-aggregate(list(gameab=df$gameab, gamehits=df$gamehits,gamesingles=df$gamesingles,gamedoubles=df$gamedoubles,
                      gametriples=df$gametriples, gamehr=df$gamehr, gamepa=df$gamepa, gameibb=df$gameibb, 
                      gameubb=df$gameubb, PA_BALL_CT=df$PA_BALL_CT, gameballs=df$gameballs, gameswingstrikes=df$gameswingstrikes), 
-                     by=list(GAME_ID=df$GAME_ID, Game=df$Game, bat_id=df$bat_id, PIT_ID=df$PIT_ID,
+                     by=list(GAME_ID=df$GAME_ID, Game=df$Game, bat_id=df$bat_id, 
                      BAT_HAND_CD=df$BAT_HAND_CD, PIT_HAND_CD=df$PIT_HAND_CD, YEAR_ID=df$YEAR_ID), FUN=max)
 
 #Merging Stolen Base points here
