@@ -2,20 +2,22 @@
 using namespace Rcpp;
 
 // [[Rcpp::export]]
-NumericVector rollingsum(NumericVector x) {
+NumericVector rollingsum(NumericVector x, int lag) {
   
   int n = x.size();
   NumericVector out(n);
   
-  // Initialize the first value as NA
-  out[0] = NA_REAL;
+  // Initialize the first j values as NA
+  for (int i = 0; i < lag; i++) {
+    out[i] = NA_REAL;
+  }
   
   // Compute the rolling sum
   double sum = 0;
   
-  for (int i = 1; i < n; i++) {
+  for (int i = lag; i < n; i++) {
     
-    sum += x[i-1];
+    sum += x[i-lag];
     out[i] = sum;
   }
   
