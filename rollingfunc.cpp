@@ -1,5 +1,6 @@
 #include <Rcpp.h>
 using namespace Rcpp;
+#include <algorithm> // for std::max_element
 
 // [[Rcpp::plugins(cpp11)]]
 
@@ -77,6 +78,60 @@ public:
   }
 };
 
+// The subclass "RollingMax"
+template <typename T>
+class RollingMax : public Rolling<T> {
+public:
+  RollingMax(T d, int l) : Rolling<T>(d, l) {}
+  NumericVector compute() override {
+    // Use the "initialize_output" method from the superclass
+    NumericVector out = this->initialize_output();
+    
+    // Declare and initialize the n variable inside the compute method
+    int n = this->data.size();
+    
+    // Compute the rolling max
+    // Initialize the rolling max to the first value in x
+    double max = this->data[0];
+    
+    // Compute the rolling max
+    for (int i = this->lag; i < n; i++) {
+      
+      max = std::max(max, this->data[i-this->lag]);
+      out[i] = max;
+    }
+    
+    return out;
+  }
+};
+
+// The subclass "RollingMin"
+template <typename T>
+class RollingMin : public Rolling<T> {
+public:
+  RollingMin(T d, int l) : Rolling<T>(d, l) {}
+  NumericVector compute() override {
+    // Use the "initialize_output" method from the superclass
+    NumericVector out = this->initialize_output();
+    
+    // Declare and initialize the n variable inside the compute method
+    int n = this->data.size();
+    
+    // Compute the rolling min
+    // Initialize the rolling min to the first value in x
+    double min = this->data[0];
+    
+    // Compute the rolling min
+    for (int i = this->lag; i < n; i++) {
+      
+      min = std::min(min, this->data[i-this->lag]);
+      out[i] = min;
+    }
+    
+    return out;
+  }
+};
+
 // [[Rcpp::export]]
 NumericVector rollingsum(NumericVector x, int lag) {
   RollingSum<NumericVector> s(x, lag);
@@ -86,5 +141,17 @@ NumericVector rollingsum(NumericVector x, int lag) {
 // [[Rcpp::export]]
 NumericVector rollingaverage(NumericVector x, int lag) {
   RollingAverage<NumericVector> s(x, lag);
+  return s.compute();
+}
+
+// [[Rcpp::export]]
+NumericVector rollingmax(NumericVector x, int lag) {
+  RollingMax<NumericVector> s(x, lag);
+  return s.compute();
+}
+
+// [[Rcpp::export]]
+NumericVector rollingmin(NumericVector x, int lag) {
+  RollingMin<NumericVector> s(x, lag);
   return s.compute();
 }
